@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const app = express();
+const bodyParser = require('body-parser');
 var Data = require('./data.js')
 
 
@@ -15,24 +16,25 @@ db.once('open', function() {
 });
 
 //func to generate ShortURLs
-function genShortURL() {
-  shortURL = Math.floor(1000 + Math.random() * 9000);
-  return shortURL;
+function genID() {
+  id = Math.floor(1000 + Math.random() * 9000);
+  return id;
 };
 
 
 //express routing and such
 app.use(express.static(path.join(__dirname, '/public')));
-var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.get('/', (req, res) => res.sendFile('/public/index.html'));
 
 app.post('/submit-url', (req, res) => {
+
+  var theID = genID();
   var newData = new Data({
     url: req.body.url,
-    shortURL: genShortURL(),
+    shortURL: theID,
     timestamp: Date.now()
   });
 
@@ -40,20 +42,26 @@ app.post('/submit-url', (req, res) => {
     if(err) {
       res.type('html').status(500);
       res.send('ERROR: ' + err);
-    } else {
-      res.send('created: ' + newData);
     }
   });
+
+  res.send('your shortURL is localhost:3000/' + theID);
 });
 
 app.get('/:shortURL', (req, res) => {
    var entry = Data.find({shortURL: req.params.shortURL}).exec((err, datas) => {
-     res.send(datas[0].url);
+     if (err) {
+       res.send(err);
+     } else {
+       //I have no idea why this works, it just does
+       res.redirect('//' + datas[0].url);
+     };
    })
 });
 
 app.get('/results', (req, res) => res.send(
   Data.find((err, datas) => {
+    if(err) {return console.error(err)};
     console.log(datas);
   })
 ));
