@@ -49,23 +49,30 @@ app.post('/submit-url', (req, res) => {
 });
 
 app.get('/:shortURL', (req, res) => {
-   var entry = Data.find({shortURL: req.params.shortURL}).exec((err, datas) => {
+   Data.findOne({shortURL: req.params.shortURL}, (err, data) => {
      if (err) {
        res.send(err);
      } else {
+       data.timestamp = Date.now();
+       data.save((err) => {
+         if (err) {
+           res.send(err);
+         }
+       });
        //I have no idea why this works, it just does
-       res.redirect('//' + datas[0].url);
-     };
-   })
+       res.redirect('//' + data.url);
+     }
+   });
 });
 
-app.get('/results', (req, res) => res.send(
-  Data.find((err, datas) => {
-    if(err) {return console.error(err)};
-    console.log(datas);
-  })
-));
+app.get('/:shortURL/info', (req, res) => {
+  Data.findOne({shortURL: req.params.shortURL}, (err, data) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(data);
+    }
+  });
+});
 
 module.exports = app;
-
-//move the stuff out of its nested func in mongo shit so we can access data, not sure how to return search results yet
