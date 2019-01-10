@@ -3,7 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const app = express();
 const bodyParser = require('body-parser');
-var Data = require('./data.js')
+var Data = require('./data.js');
 
 
 //mongodb stuff
@@ -15,12 +15,6 @@ db.once('open', function() {
   console.log('connected to local database')
 });
 
-//func to generate ShortURLs
-function genID() {
-  id = Math.floor(1000 + Math.random() * 9000);
-  return id;
-};
-
 
 //express routing and such
 app.use(express.static(path.join(__dirname, '/public')));
@@ -31,10 +25,9 @@ app.get('/', (req, res) => res.sendFile('/public/index.html'));
 
 app.post('/submit-url', (req, res) => {
 
-  var theID = genID();
   var newData = new Data({
+    _id: 1111,
     url: req.body.url,
-    shortURL: theID,
     timestamp: Date.now()
   });
 
@@ -42,17 +35,18 @@ app.post('/submit-url', (req, res) => {
     if(err) {
       res.type('html').status(500);
       res.send('ERROR: ' + err);
-    }
+    } else {
+      res.send('your shortURL is localhost:3000/' + newData._id);
+    };
   });
-
-  res.send('your shortURL is localhost:3000/' + theID);
 });
 
-app.get('/:shortURL', (req, res) => {
-   Data.findOne({shortURL: req.params.shortURL}, (err, data) => {
+app.get('/:id', (req, res) => {
+   Data.findOne({_id: req.params.id}, (err, data) => {
      if (err) {
        res.send(err);
      } else {
+       //set the timestamp to now every time redirect is used for db cleanup
        data.timestamp = Date.now();
        data.save((err) => {
          if (err) {
@@ -65,8 +59,8 @@ app.get('/:shortURL', (req, res) => {
    });
 });
 
-app.get('/:shortURL/info', (req, res) => {
-  Data.findOne({shortURL: req.params.shortURL}, (err, data) => {
+app.get('/:id/info', (req, res) => {
+  Data.findOne({_id: req.params.id}, (err, data) => {
     if (err) {
       res.send(err);
     } else {
