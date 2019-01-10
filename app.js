@@ -24,21 +24,24 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.get('/', (req, res) => res.sendFile('/public/index.html'));
 
 app.post('/submit-url', (req, res) => {
+  function createShortURL(reqURL) {
+    var newData = new Data({
+      _id: Math.floor(0 + Math.random() * 9999),
+      url: reqURL,
+      timestamp: Date.now()
+    });
 
-  var newData = new Data({
-    _id: 1111,
-    url: req.body.url,
-    timestamp: Date.now()
-  });
+    newData.save((err) => {
+      if(err) {
+        createShortURL(reqURL);
+      } else {
+        res.send('your shortURL is localhost:3000/' + newData._id);
+      };
+    });
+  };
 
-  newData.save((err) => {
-    if(err) {
-      res.type('html').status(500);
-      res.send('ERROR: ' + err);
-    } else {
-      res.send('your shortURL is localhost:3000/' + newData._id);
-    };
-  });
+  createShortURL(req.body.url);
+
 });
 
 app.get('/:id', (req, res) => {
@@ -54,6 +57,7 @@ app.get('/:id', (req, res) => {
          }
        });
        //I have no idea why this works, it just does
+       //okay for real this needs fixing though as the // prefix fucks with some URLS
        res.redirect('//' + data.url);
      }
    });
