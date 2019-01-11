@@ -33,7 +33,20 @@ app.post('/submit-url', (req, res) => {
 
     newData.save((err) => {
       if(err) {
-        createShortURL(reqURL);
+        //find out which schema field the error originated from
+        var a = Object.values(err)[0];
+        var b = Object.keys(a)[0];
+        if (b == 'url') {
+          //if its a duplicate url, return the shortURL already in the db instead of making a new doc
+          return Data.findOne({url: reqURL})
+          .exec(function(err, doc) {
+            res.send('your shortURL is localhost:3000/' + doc._id);
+          });
+        } else if (b == '_id') {
+          //if its a duplicate id, recursively run the function until we get a non-duplicate
+          console.log('try');
+          createShortURL(reqURL);
+        };
       } else {
         res.send('your shortURL is localhost:3000/' + newData._id);
       };

@@ -14,17 +14,39 @@ var dataSchema = new mongoose.Schema({
           } else if (doc) {
             if(self._id === doc._id) {
               return isValid(false);
-            }
+            };
             return isValid(true);
           } else {
             return isValid(true);
           }
         });
       },
-      message: 'that id already exists, we need to use another'
+      message: '_id already exists'
     }
   },
-  url: String,
+  url: {
+    type: String,
+    validate: {
+      isAsync: true,
+      validator: function(theURL, isValid) {
+        const self = this;
+        return self.constructor.findOne({url: theURL})
+        .exec(function(err, doc) {
+          if (err) {
+            throw err;
+          } else if (doc) {
+            if(self.url === doc.url) {
+              return isValid(false);
+            };
+            return isValid(true);
+          } else {
+            return isValid(true);
+          }
+        });
+      },
+      message: 'url already exists'
+    }
+  },
   timestamp: Number
 });
 
