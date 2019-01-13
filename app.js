@@ -58,22 +58,16 @@ app.post('/submit-url', (req, res) => {
 });
 
 app.get('/:id', (req, res) => {
-   Data.findOne({_id: req.params.id}, (err, data) => {
-     if (err) {
-       res.send(err);
-     } else {
-       //set the timestamp to now every time redirect is used for db cleanup
-       data.timestamp = Date.now();
-       data.save((err) => {
-         if (err) {
-           res.send(err);
-         }
-       });
-       //I have no idea why this works, it just does
-       //okay for real this needs fixing though as the // prefix fucks with some URLS
-       res.redirect('//' + data.url);
-     }
-   });
+  //set the timestamp to now every time redirect is used for db cleanup
+  Data.findOneAndUpdate({_id: req.params.id}, {timestamp: Date.now()}, (err, data) => {
+    if (err) {
+      res.send(err);
+    } else {
+      //I have no idea why this works, it just does
+      //okay for real this needs fixing though as the // prefix fucks with some URLS
+      res.redirect('//' + data.url);
+    }
+  });
 });
 
 app.get('/:id/info', (req, res) => {
