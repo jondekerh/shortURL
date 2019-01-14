@@ -63,9 +63,12 @@ app.get('/:id', (req, res) => {
     if (err) {
       res.send(err);
     } else {
-      //I have no idea why this works, it just does
-      //okay for real this needs fixing though as the // prefix fucks with some URLS
-      res.redirect('//' + data.url);
+      //the // makes it work if http isn't included at the beginning
+      if (data.url.startsWith('http://') || data.url.startsWith('https://')) {
+        res.redirect(data.url);
+      } else {
+        res.redirect('//' + data.url);
+      }
     }
   });
 });
