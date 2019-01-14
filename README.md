@@ -35,7 +35,8 @@ http://localhost/4444/info
 This document contains the shortURL, the address it redirects to, and the timestamp indicating when it was last used. Using this endpoint DOES NOT update the timestamp.
 
 **Automatic database cleanup:**
-When a shortURL is used its timestamp will be updated to the current date and time in milliseconds. Every hour a cleanup function will run which checks the database for any documents where this timestamp is more than a week old and delete them to free up space.
+When a shortURL is used its timestamp will be updated to the current date and time in milliseconds. Every hour a cleanup function will run which checks the database for any documents where this timestamp is more than a week old and deletes them to free up space.
 
 # To Do
+- [ ] Clean up this readme.
 - [ ] Add proper tests.
