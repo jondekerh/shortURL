@@ -3,6 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const app = express();
 const bodyParser = require('body-parser');
+const dns = require('dns');
 var Data = require('./data.js');
 
 
@@ -53,7 +54,14 @@ app.post('/submit-url', (req, res) => {
     });
   };
 
-  createShortURL(req.body.url);
+  //use DNS lookup to see if address is valid before we run any of the code above
+  dns.lookup(req.body.url, (err) => {
+    if (err) {
+      res.send('ERROR: INVALID ADDRESS');
+    } else {
+      createShortURL(req.body.url);
+    }
+  });
 
 });
 

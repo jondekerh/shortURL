@@ -9,7 +9,7 @@ function dbCleanup() {
   var weekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
   cutoffTime = cutoffTime.getTime() - weekInMilliseconds;
 
-  Data.deleteMany({timestamp: {$lt: Date.now()}}).exec();
+  Data.deleteMany({timestamp: {$lt: cutoffTime}}).exec();
 };
 
 app.listen(port, () => {
