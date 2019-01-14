@@ -63,10 +63,12 @@ app.get('/:id', (req, res) => {
     if (err) {
       res.send(err);
     } else {
-      //the // makes it work if http isn't included at the beginning
-      if (data.url.startsWith('http://') || data.url.startsWith('https://')) {
+      if (data == null) {
+        res.status(404).send('Link not found');
+      } else if (data.url.startsWith('http://') || data.url.startsWith('https://')) {
         res.redirect(data.url);
       } else {
+        //the // makes it work if http isn't included at the beginning
         res.redirect('//' + data.url);
       }
     }
